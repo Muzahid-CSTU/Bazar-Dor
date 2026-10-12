@@ -3,6 +3,7 @@ import Hero from "@/homePage/Hero";
 import PriceTicker from "@/components/PriceTicker";
 import PriceRisers from "@/homePage/PriceRisers";
 import PriceFallers from "@/homePage/PriceFallers";
+import ProductList from "@/homePage/ProductList";
 
 export default function Home() {
   return (
@@ -11,6 +12,7 @@ export default function Home() {
       <Hero />
       <PriceRisers />
       <PriceFallers />
+      <ProductList />
     </div>
   );
 }
