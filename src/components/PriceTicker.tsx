@@ -1,65 +1,120 @@
+
 "use client";
 
-import {
-  FaArrowTrendUp,
-  FaArrowTrendDown,
-} from "react-icons/fa6";
+import { useProducts, type Product } from "@/context/ProductContext";
 
-const priceItems = [
-  { name: "সুগন্ধি চাল", price: "৪৮", change: "২.৫", up: true },
-  { name: "মিনিকেট চাল", price: "৬৫", change: "১.৫", up: false },
-  { name: "বাটার সয়াবিন তেল", price: "১৬৬", change: "০.৩", up: true },
-  { name: "মসুর ডাল", price: "৮৪", change: "২.৯", up: true },
-  { name: "ভোজ্য তেল", price: "১৭০", change: "১.৮", up: false },
-  { name: "আমন চাল", price: "৫৮", change: "০.৭", up: false },
-];
+function bnNumber(value: number) {
+  return new Intl.NumberFormat("bn-BD", {
+    maximumFractionDigits: 1,
+  }).format(value);
+}
+
+function getUnit(unit: string) {
+  const units: Record<string, string> = {
+    kg: "কেজি",
+    liter: "লিটার",
+    piece: "পিস",
+    pcs: "পিস",
+    dozen: "ডজন",
+  };
+
+  return units[unit?.toLowerCase()] ?? unit ?? "কেজি";
+}
+
+function ProductIcon({ product }: { product: Product }) {
+  const icon = product.image || product.categoryIcon || "🛒";
+
+  if (/^https?:\/\//i.test(icon)) {
+    return (
+      <img
+        src={icon}
+        alt=""
+        className="h-5 w-5 shrink-0 object-contain"
+      />
+    );
+  }
+
+  return (
+    <span className="text-sm leading-none" aria-hidden="true">
+      {icon}
+    </span>
+  );
+}
 
 export default function PriceTicker() {
+  const { products, loading, error } = useProducts();
+
+  if (loading) {
+    return (
+      <section
+        aria-label="বাজারদরের আপডেট"
+        className="h-12 w-full border-y border-[#e2eae3] bg-[#fbfdfb]"
+      />
+    );
+  }
+
+  if (error || products.length === 0) {
+    return (
+      <section
+        aria-label="বাজারদরের আপডেট"
+        className="flex h-12 items-center border-y border-[#e2eae3] bg-[#fbfdfb] px-4"
+      >
+        <p className="text-xs text-gray-500">
+          এই মুহূর্তে বাজারদরের তথ্য পাওয়া যাচ্ছে না।
+        </p>
+      </section>
+    );
+  }
+
   return (
     <section
-      aria-label="বাজারদরের সংক্ষিপ্ত আপডেট"
-      className="w-full overflow-hidden border-y border-gray-100 bg-white"
+      aria-label="বাজারদরের আপডেট"
+      className="w-full overflow-hidden border-y border-[#e2eae3] bg-[#fbfdfb]"
     >
-      <div className="flex h-8 items-center">
+      <div className="flex h-12 items-center overflow-hidden">
         <div className="ticker-track flex w-max items-center">
-          {[...priceItems, ...priceItems].map((item, index) => (
-            <div
-              key={`${item.name}-${index}`}
-              className="flex h-8 shrink-0 items-center gap-1.5 border-r border-gray-100 px-3 text-[10px] sm:text-[11px]"
-            >
-              <span
-                className={`shrink-0 ${
-                  item.name.includes("ডাল")
-                    ? "text-red-800"
-                    : "text-gray-400"
-                }`}
-                aria-hidden="true"
+          {[...products, ...products].map((product, index) => {
+            const direction = product.change?.dir ?? "flat";
+            const percentage = Math.abs(product.change?.pct ?? 0);
+
+            return (
+              <div
+                key={`${product.id}-${index}`}
+                className="flex h-12 shrink-0 items-center gap-2 border-r border-[#e2eae3] px-3 sm:px-4"
               >
-                ●
-              </span>
+                <ProductIcon product={product} />
 
-              <span className="font-medium text-gray-700">
-                {item.name}
-              </span>
+                <span className="whitespace-nowrap text-xs font-medium text-[#303a32] sm:text-sm">
+                  {product.nameBn}
+                </span>
 
-              <span className="whitespace-nowrap text-gray-600">
-                {item.price} টাকা/কেজি
-              </span>
+                <span className="whitespace-nowrap text-xs font-semibold text-[#303a32] sm:text-sm">
+                  {bnNumber(product.today)} টাকা/
+                  {getUnit(product.unit)}
+                </span>
 
-              <span
-                className={`flex shrink-0 items-center gap-1 whitespace-nowrap font-semibold ${
-                  item.up ? "text-red-600" : "text-green-600"
-                }`}
-              >
-                {item.up ? (
-                  <FaArrowTrendUp aria-hidden="true" />
-                ) : (
-                  <FaArrowTrendDown aria-hidden="true" />
-                )}
-                {item.change}%
-              </span>
-            </div>
-          ))}
+                <span
+                  className={`flex shrink-0 items-center gap-1 whitespace-nowrap text-xs font-bold sm:text-sm ${
+                    direction === "up"
+                      ? "text-[#dc3f43]"
+                      : direction === "down"
+                        ? "text-[#159653]"
+                        : "text-[#68736a]"
+                  }`}
+                >
+                  {direction === "up" ? (
+                    <span aria-label="দাম বেড়েছে">▲</span>
+                  ) : direction === "down" ? (
+                    <span aria-label="দাম কমেছে">▼</span>
+                  ) : (
+                    <span aria-label="দাম অপরিবর্তিত">—</span>
+                  )}
+
+                  {bnNumber(percentage)}%
+                </span>
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>

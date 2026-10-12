@@ -1,31 +1,7 @@
+
 "use client";
 
-import { useEffect, useState } from "react";
-import Image from "next/image";
-import {
-  FaArrowTrendUp,
-  FaArrowTrendDown,
-} from "react-icons/fa6";
-
-type Product = {
-  id: number;
-  slug: string;
-  nameBn: string;
-  category: string;
-  categoryNameBn: string;
-  categoryIcon: string;
-  unit: string;
-  image: string;
-  today: number;
-  yesterday: number;
-  change: {
-    dir: "up" | "down" | "flat";
-    pct: number;
-  };
-};
-
-const API_URL =
-  "https://openapi.programming-hero.com/api/bazardor/products";
+import { useProducts } from "@/context/ProductContext";
 
 function bnNumber(value: number) {
   return new Intl.NumberFormat("bn-BD", {
@@ -45,72 +21,8 @@ function getUnit(unit: string) {
   return units[unit?.toLowerCase()] ?? unit ?? "কেজি";
 }
 
-function ProductIcon({ product }: { product: Product }) {
-  const icon = product.image || product.categoryIcon || "🛒";
-  const isImageUrl = /^https?:\/\//i.test(icon);
-
-  if (isImageUrl) {
-    return (
-      <Image
-        src={icon}
-        alt={product.nameBn}
-        width={36}
-        height={36}
-        unoptimized
-        className="h-full w-full object-contain p-1"
-      />
-    );
-  }
-
-  return (
-    <span className="flex h-full w-full items-center justify-center text-xl">
-      {icon}
-    </span>
-  );
-}
-
 export default function ProductList() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    async function fetchProducts() {
-      try {
-        const response = await fetch(API_URL, {
-          signal: controller.signal,
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch products");
-        }
-
-        const data: unknown = await response.json();
-
-        if (!Array.isArray(data)) {
-          throw new Error("Invalid API response");
-        }
-
-        setProducts(data as Product[]);
-      } catch (err) {
-        if (err instanceof Error && err.name === "AbortError") {
-          return;
-        }
-
-        setError("পণ্যের তথ্য লোড করা যায়নি। আবার চেষ্টা করো।");
-      } finally {
-        if (!controller.signal.aborted) {
-          setLoading(false);
-        }
-      }
-    }
-
-    fetchProducts();
-
-    return () => controller.abort();
-  }, []);
+  const { products, loading, error, refreshProducts } = useProducts();
 
   return (
     <section
@@ -118,7 +30,7 @@ export default function ProductList() {
       className="bg-[#f0f5f0] px-4 py-3 sm:px-5"
     >
       <div className="mx-auto max-w-6xl">
-        {/* Section heading */}
+        {/* Section Heading */}
         <div className="mb-3">
           <h2 className="text-base font-bold text-[#303a32]">
             সব পণ্য
@@ -131,7 +43,7 @@ export default function ProductList() {
           </p>
         </div>
 
-        {/* Loading skeleton */}
+        {/* Loading Skeleton */}
         {loading && (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 6 }).map((_, index) => (
@@ -141,25 +53,27 @@ export default function ProductList() {
               >
                 <div className="flex gap-3">
                   <div className="h-9 w-9 rounded-[10px] bg-gray-200" />
+
                   <div className="flex-1">
                     <div className="h-3 w-28 rounded bg-gray-200" />
                     <div className="mt-2 h-2 w-16 rounded bg-gray-200" />
                   </div>
                 </div>
+
                 <div className="mt-4 h-3 w-20 rounded bg-gray-200" />
               </div>
             ))}
           </div>
         )}
 
-        {/* Error state */}
+        {/* Error State */}
         {!loading && error && (
           <div className="py-8 text-center">
             <p className="text-sm text-red-600">{error}</p>
 
             <button
               type="button"
-              onClick={() => window.location.reload()}
+              onClick={() => void refreshProducts()}
               className="mt-3 rounded-lg bg-green-700 px-4 py-2 text-sm text-white hover:bg-green-800"
             >
               আবার চেষ্টা করো
@@ -167,7 +81,7 @@ export default function ProductList() {
           </div>
         )}
 
-        {/* Product cards */}
+        {/* Product Cards */}
         {!loading && !error && products.length > 0 && (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {products.map((product) => {
@@ -179,9 +93,12 @@ export default function ProductList() {
                   key={product.id}
                   className="rounded-[14px] border border-[#e2eae3] bg-[#fbfdfb] p-3 transition-shadow hover:shadow-sm"
                 >
+                  {/* Product Information */}
                   <div className="flex items-center gap-2.5">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-[10px] bg-[#f0f5f0]">
-                      <ProductIcon product={product} />
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-[10px] bg-[#f0f5f0] text-xl">
+                      <span aria-hidden="true">
+                        {product.image || product.categoryIcon || "🛒"}
+                      </span>
                     </div>
 
                     <div className="min-w-0">
@@ -195,6 +112,7 @@ export default function ProductList() {
                     </div>
                   </div>
 
+                  {/* Price and Percentage */}
                   <div className="mt-2 flex items-end justify-between gap-2">
                     <div>
                       <p className="text-[10px] leading-4 text-[#778078]">
@@ -219,11 +137,11 @@ export default function ProductList() {
                       }`}
                     >
                       {trend === "up" ? (
-                        <FaArrowTrendUp size={9} />
+                        <span aria-hidden="true">▲</span>
                       ) : trend === "down" ? (
-                        <FaArrowTrendDown size={9} />
+                        <span aria-hidden="true">▼</span>
                       ) : (
-                        <span>−</span>
+                        <span aria-hidden="true">−</span>
                       )}
 
                       {bnNumber(percentage)}%
@@ -235,7 +153,7 @@ export default function ProductList() {
           </div>
         )}
 
-        {/* Empty state */}
+        {/* Empty State */}
         {!loading && !error && products.length === 0 && (
           <p className="py-8 text-center text-sm text-gray-500">
             কোনো পণ্য পাওয়া যায়নি।
