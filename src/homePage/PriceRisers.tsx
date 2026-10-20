@@ -1,6 +1,6 @@
-
 "use client";
 
+import Link from "next/link";
 import { useProducts } from "@/context/ProductContext";
 
 function bnNumber(value: number) {
@@ -36,7 +36,6 @@ export default function PriceRisers() {
   return (
     <section className="bg-[#f0f5f0] px-4 py-5 sm:px-5">
       <div className="mx-auto max-w-6xl">
-        {/* Section Heading */}
         <h2 className="mb-3 flex items-center gap-2 text-base font-bold text-[#303a32]">
           <span
             className="text-[13px] leading-none text-[#dc3f43]"
@@ -47,7 +46,6 @@ export default function PriceRisers() {
           আজ দাম বেড়েছে
         </h2>
 
-        {/* Loading and Error States */}
         {loading ? (
           <p className="py-4 text-sm text-[#778078]">
             পণ্যের তথ্য লোড হচ্ছে...
@@ -63,9 +61,11 @@ export default function PriceRisers() {
         ) : (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {risingProducts.map((product) => (
-              <article
+              <Link
                 key={product.id}
-                className="rounded-[14px] border border-[#e2eae3] bg-[#fbfdfb] p-3 transition-shadow hover:shadow-sm sm:p-3"
+                href={`/product/${product.slug}`}
+                aria-label={`${product.nameBn} এর বিস্তারিত দেখুন`}
+                className="block rounded-[14px] border border-[#e2eae3] bg-[#fbfdfb] p-3 transition-shadow hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-green-700 sm:p-3"
               >
                 {/* Product Information */}
                 <div className="flex items-center gap-2.5">
@@ -115,7 +115,7 @@ export default function PriceRisers() {
                     %
                   </span>
                 </div>
-              </article>
+              </Link>
             ))}
           </div>
         )}

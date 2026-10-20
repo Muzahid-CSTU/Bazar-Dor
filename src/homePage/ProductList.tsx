@@ -1,6 +1,6 @@
-
 "use client";
 
+import Link from "next/link";
 import { useProducts } from "@/context/ProductContext";
 
 function bnNumber(value: number) {
@@ -89,9 +89,11 @@ export default function ProductList() {
               const percentage = Math.abs(product.change?.pct ?? 0);
 
               return (
-                <article
+                <Link
                   key={product.id}
-                  className="rounded-[14px] border border-[#e2eae3] bg-[#fbfdfb] p-3 transition-shadow hover:shadow-sm"
+                  href={`/product/${product.slug}`}
+                  aria-label={`${product.nameBn} এর বিস্তারিত দেখুন`}
+                  className="block rounded-[14px] border border-[#e2eae3] bg-[#fbfdfb] p-3 transition-shadow hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-green-700"
                 >
                   {/* Product Information */}
                   <div className="flex items-center gap-2.5">
@@ -147,7 +149,7 @@ export default function ProductList() {
                       {bnNumber(percentage)}%
                     </span>
                   </div>
-                </article>
+                </Link>
               );
             })}
           </div>

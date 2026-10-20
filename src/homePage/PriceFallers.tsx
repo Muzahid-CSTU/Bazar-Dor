@@ -1,6 +1,7 @@
 
 "use client";
 
+import Link from "next/link";
 import { useProducts } from "@/context/ProductContext";
 
 function bnNumber(value: number) {
@@ -13,6 +14,7 @@ function getUnit(unit: string) {
   const units: Record<string, string> = {
     kg: "কেজি",
     liter: "লিটার",
+    litre: "লিটার",
     piece: "পিস",
     pcs: "পিস",
     dozen: "ডজন",
@@ -36,7 +38,6 @@ export default function PriceFallers() {
   return (
     <section className="bg-[#f0f5f0] px-4 py-3 sm:px-5">
       <div className="mx-auto max-w-6xl">
-        {/* Section Heading */}
         <h2 className="mb-3 flex items-center gap-2 text-base font-bold text-[#303a32]">
           <span
             className="text-[13px] leading-none text-[#159653]"
@@ -47,7 +48,6 @@ export default function PriceFallers() {
           আজ দাম কমেছে
         </h2>
 
-        {/* Loading and Error States */}
         {loading ? (
           <p className="py-4 text-sm text-[#778078]">
             পণ্যের তথ্য লোড হচ্ছে...
@@ -63,11 +63,12 @@ export default function PriceFallers() {
         ) : (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {fallingProducts.map((product) => (
-              <article
+              <Link
                 key={product.id}
-                className="rounded-[14px] border border-[#e2eae3] bg-[#fbfdfb] p-3"
+                href={`/product/${product.slug}`}
+                aria-label={`${product.nameBn} এর বিস্তারিত দেখুন`}
+                className="block rounded-[14px] border border-[#e2eae3] bg-[#fbfdfb] p-3 transition-shadow hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-green-700"
               >
-                {/* Product Information */}
                 <div className="flex items-center gap-2.5">
                   <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-[#f0f5f0] text-xl">
                     <span aria-hidden="true">
@@ -86,7 +87,6 @@ export default function PriceFallers() {
                   </div>
                 </div>
 
-                {/* Today's Price and Price Change */}
                 <div className="mt-2 flex items-end justify-between gap-2">
                   <div>
                     <p className="text-[10px] leading-4 text-[#778078]">
@@ -102,20 +102,11 @@ export default function PriceFallers() {
                   </div>
 
                   <span className="mb-0.5 inline-flex shrink-0 items-center gap-1 rounded-full bg-[#edf6ef] px-2 py-1 text-[9px] font-bold text-[#159653]">
-                    <span
-                      className="text-[9px] leading-none"
-                      aria-hidden="true"
-                    >
-                      ▼
-                    </span>
-
-                    {bnNumber(
-                      Math.abs(product.change?.pct ?? 0)
-                    )}
-                    %
+                    <span aria-hidden="true">▼</span>
+                    {bnNumber(Math.abs(product.change?.pct ?? 0))}%
                   </span>
                 </div>
-              </article>
+              </Link>
             ))}
           </div>
         )}
