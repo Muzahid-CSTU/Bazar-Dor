@@ -1,36 +1,35 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+BazarDor (বাজার দর) 🛒
+A modern web platform designed to monitor, track, and compare the daily market prices of essential daily commodities. It provides price transparency for daily groceries, helping consumers make informed purchasing decisions.
+BazarDor serves as an interactive price-tracking dashboard for everyday grocery essentials. The platform categorizes and displays up-to-date market rates across essential staples such as rice, lentils, oil, vegetables, fish, meat, dairy, and spices. Users can securely sign up, manage their account profile, and analyze price trends through a responsive, modern interface.
 
-## Getting Started
+## Technologies
 
-First, run the development server:
+- Next.js 16
+- TypeScript
+- Tailwind CSS
+- BetterAuth (Email/Password, Google, GitHub)
+- MongoDB
+- Context API
+- react-hot-toast
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Key Features:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Multi-Provider Authentication (BetterAuth):
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Supports traditional credentials authentication (Email & Password) alongside seamless social logins via Google and GitHub OAuth.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Real-Time Toast Notifications:
 
-## Learn More
+Integrated with react-hot-toast to provide instant user feedback on actions such as sign-in, account creation, logout, profile updates, and form validation errors.
 
-To learn more about Next.js, take a look at the following resources:
+Smooth Skeleton Loaders:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Features animated placeholder skeleton loaders across profiles and data-fetching views, eliminating sudden layout shifts and improving perceived performance.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Category-Based Product Filtering:
 
-## Deploy on Vercel
+Organizes essential items into dedicated categories (Rice, Lentils, Oil, Vegetables, Fish, Meat, Dairy, and Spices) with instant navigation and price breakdowns.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+User Profile & Account Management:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Dedicated dashboard allowing authenticated users to review account details, preview OAuth profile avatars, update their display name, and securely sign out.
