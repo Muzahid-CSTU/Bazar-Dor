@@ -1,6 +1,6 @@
 "use client";
 
-import {
+import React, {
   createContext,
   useCallback,
   useContext,
@@ -35,18 +35,11 @@ type ProductContextType = {
   refreshProducts: () => Promise<void>;
 };
 
-const ProductContext = createContext<ProductContextType | undefined>(
-  undefined
-);
+const ProductContext = createContext<ProductContextType | undefined>(undefined);
 
-const API_URL =
-  "https://openapi.programming-hero.com/api/bazardor/products";
+const API_URL = "https://openapi.programming-hero.com/api/bazardor/products";
 
-export function ProductProvider({
-  children,
-}: {
-  children: ReactNode;
-}) {
+export const ProductProvider = ({ children }: { children: ReactNode }) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -108,16 +101,14 @@ export function ProductProvider({
       {children}
     </ProductContext.Provider>
   );
-}
+};
 
-export function useProducts() {
+export const useProducts = () => {
   const context = useContext(ProductContext);
 
   if (!context) {
-    throw new Error(
-      "useProducts must be used inside ProductProvider"
-    );
+    throw new Error("useProducts must be used inside ProductProvider");
   }
 
   return context;
-}
+};

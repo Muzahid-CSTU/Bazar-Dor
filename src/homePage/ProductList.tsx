@@ -1,15 +1,16 @@
 "use client";
 
+import React from "react";
 import Link from "next/link";
 import { useProducts } from "@/context/ProductContext";
 
-function bnNumber(value: number) {
+const bnNumber = (value: number) => {
   return new Intl.NumberFormat("bn-BD", {
     maximumFractionDigits: 1,
   }).format(value);
-}
+};
 
-function getUnit(unit: string) {
+const getUnit = (unit: string) => {
   const units: Record<string, string> = {
     kg: "কেজি",
     liter: "লিটার",
@@ -19,9 +20,9 @@ function getUnit(unit: string) {
   };
 
   return units[unit?.toLowerCase()] ?? unit ?? "কেজি";
-}
+};
 
-export default function ProductList() {
+const ProductList = () => {
   const { products, loading, error, refreshProducts } = useProducts();
 
   return (
@@ -30,7 +31,6 @@ export default function ProductList() {
       className="bg-[#f0f5f0] px-4 py-3 sm:px-5"
     >
       <div className="mx-auto max-w-6xl">
-        {/* Section Heading */}
         <div className="mb-3">
           <h2 className="text-base font-bold text-[#303a32]">
             সব পণ্য
@@ -43,7 +43,6 @@ export default function ProductList() {
           </p>
         </div>
 
-        {/* Loading Skeleton */}
         {loading && (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 6 }).map((_, index) => (
@@ -66,7 +65,6 @@ export default function ProductList() {
           </div>
         )}
 
-        {/* Error State */}
         {!loading && error && (
           <div className="py-8 text-center">
             <p className="text-sm text-red-600">{error}</p>
@@ -81,7 +79,6 @@ export default function ProductList() {
           </div>
         )}
 
-        {/* Product Cards */}
         {!loading && !error && products.length > 0 && (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {products.map((product) => {
@@ -95,7 +92,6 @@ export default function ProductList() {
                   aria-label={`${product.nameBn} এর বিস্তারিত দেখুন`}
                   className="block rounded-[14px] border border-[#e2eae3] bg-[#fbfdfb] p-3 transition-shadow hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-green-700"
                 >
-                  {/* Product Information */}
                   <div className="flex items-center gap-2.5">
                     <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-[10px] bg-[#f0f5f0] text-xl">
                       <span aria-hidden="true">
@@ -114,7 +110,6 @@ export default function ProductList() {
                     </div>
                   </div>
 
-                  {/* Price and Percentage */}
                   <div className="mt-2 flex items-end justify-between gap-2">
                     <div>
                       <p className="text-[10px] leading-4 text-[#778078]">
@@ -155,7 +150,6 @@ export default function ProductList() {
           </div>
         )}
 
-        {/* Empty State */}
         {!loading && !error && products.length === 0 && (
           <p className="py-8 text-center text-sm text-gray-500">
             কোনো পণ্য পাওয়া যায়নি।
@@ -164,4 +158,6 @@ export default function ProductList() {
       </div>
     </section>
   );
-}
+};
+
+export default ProductList;

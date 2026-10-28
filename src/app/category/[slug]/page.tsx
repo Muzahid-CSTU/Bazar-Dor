@@ -1,5 +1,4 @@
-
-import { Suspense } from "react";
+import React, { Suspense } from "react";
 import CategoryPage from "./CategoryPage";
 
 type PageProps = {
@@ -8,7 +7,7 @@ type PageProps = {
   }>;
 };
 
-function CategoryLoading() {
+const CategoryLoading = () => {
   return (
     <section className="min-h-[60vh] bg-[#f0f5f0] px-4 py-8">
       <div className="mx-auto max-w-6xl">
@@ -30,18 +29,20 @@ function CategoryLoading() {
       </div>
     </section>
   );
-}
+};
 
-async function CategoryContent({ params }: PageProps) {
+const CategoryContent = async ({ params }: PageProps) => {
   const { slug } = await params;
 
   return <CategoryPage slug={slug} />;
-}
+};
 
-export default function Page({ params }: PageProps) {
+const Page = ({ params }: PageProps) => {
   return (
     <Suspense fallback={<CategoryLoading />}>
       <CategoryContent params={params} />
     </Suspense>
   );
-}
+};
+
+export default Page;

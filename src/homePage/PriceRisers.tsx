@@ -1,15 +1,16 @@
 "use client";
 
+import React from "react";
 import Link from "next/link";
 import { useProducts } from "@/context/ProductContext";
 
-function bnNumber(value: number) {
+const bnNumber = (value: number) => {
   return new Intl.NumberFormat("bn-BD", {
     maximumFractionDigits: 1,
   }).format(value);
-}
+};
 
-function getUnit(unit: string) {
+const getUnit = (unit: string) => {
   const units: Record<string, string> = {
     kg: "কেজি",
     liter: "লিটার",
@@ -19,9 +20,9 @@ function getUnit(unit: string) {
   };
 
   return units[unit?.toLowerCase()] ?? unit ?? "কেজি";
-}
+};
 
-export default function PriceRisers() {
+const PriceRisers = () => {
   const { products, loading, error } = useProducts();
 
   const risingProducts = products
@@ -67,7 +68,6 @@ export default function PriceRisers() {
                 aria-label={`${product.nameBn} এর বিস্তারিত দেখুন`}
                 className="block rounded-[14px] border border-[#e2eae3] bg-[#fbfdfb] p-3 transition-shadow hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-green-700 sm:p-3"
               >
-                {/* Product Information */}
                 <div className="flex items-center gap-2.5">
                   <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-[#f0f5f0] text-xl">
                     <span aria-hidden="true">
@@ -86,7 +86,6 @@ export default function PriceRisers() {
                   </div>
                 </div>
 
-                {/* Today's Price and Price Change */}
                 <div className="mt-2 flex items-end justify-between gap-2">
                   <div>
                     <p className="text-[10px] leading-4 text-[#778078]">
@@ -109,10 +108,7 @@ export default function PriceRisers() {
                       ▲
                     </span>
 
-                    {bnNumber(
-                      Math.abs(product.change?.pct ?? 0)
-                    )}
-                    %
+                    {bnNumber(Math.abs(product.change?.pct ?? 0))}%
                   </span>
                 </div>
               </Link>
@@ -122,4 +118,6 @@ export default function PriceRisers() {
       </div>
     </section>
   );
-}
+};
+
+export default PriceRisers;

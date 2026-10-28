@@ -10,7 +10,18 @@ export const auth = betterAuth({
   emailAndPassword: { 
     enabled: true, 
   },
+  socialProviders: {
+    google: { 
+      clientId: process.env.GOOGLE_CLIENT_ID as string, 
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string, 
+      scope: ["openid", "profile", "email"],
+    },
+    github: { 
+      clientId: process.env.GITHUB_CLIENT_ID as string, 
+      clientSecret: process.env.GITHUB_CLIENT_SECRET as string, 
+    },
+  },
   logger: {
-    level: "debug", // এতে ইন্টারনাল সব এরর টার্মিনালে পরিষ্কার দেখা যাবে
+    level: "debug", 
   },
 });

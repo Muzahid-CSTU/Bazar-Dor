@@ -1,16 +1,16 @@
-
 "use client";
 
+import React from "react";
 import Link from "next/link";
 import { useProducts } from "@/context/ProductContext";
 
-function bnNumber(value: number) {
+const bnNumber = (value: number) => {
   return new Intl.NumberFormat("bn-BD", {
     maximumFractionDigits: 1,
   }).format(value);
-}
+};
 
-function getUnit(unit: string) {
+const getUnit = (unit: string) => {
   const units: Record<string, string> = {
     kg: "কেজি",
     liter: "লিটার",
@@ -21,9 +21,9 @@ function getUnit(unit: string) {
   };
 
   return units[unit?.toLowerCase()] ?? unit ?? "কেজি";
-}
+};
 
-export default function PriceFallers() {
+const PriceFallers = () => {
   const { products, loading, error } = useProducts();
 
   const fallingProducts = products
@@ -113,4 +113,6 @@ export default function PriceFallers() {
       </div>
     </section>
   );
-}
+};
+
+export default PriceFallers;

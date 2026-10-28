@@ -1,15 +1,15 @@
-
 "use client";
 
+import React from "react";
 import { useProducts, type Product } from "@/context/ProductContext";
 
-function bnNumber(value: number) {
+const bnNumber = (value: number) => {
   return new Intl.NumberFormat("bn-BD", {
     maximumFractionDigits: 1,
   }).format(value);
-}
+};
 
-function getUnit(unit: string) {
+const getUnit = (unit: string) => {
   const units: Record<string, string> = {
     kg: "কেজি",
     liter: "লিটার",
@@ -19,9 +19,9 @@ function getUnit(unit: string) {
   };
 
   return units[unit?.toLowerCase()] ?? unit ?? "কেজি";
-}
+};
 
-function ProductIcon({ product }: { product: Product }) {
+const ProductIcon = ({ product }: { product: Product }) => {
   const icon = product.image || product.categoryIcon || "🛒";
 
   if (/^https?:\/\//i.test(icon)) {
@@ -39,9 +39,9 @@ function ProductIcon({ product }: { product: Product }) {
       {icon}
     </span>
   );
-}
+};
 
-export default function PriceTicker() {
+const PriceTicker = () => {
   const { products, loading, error } = useProducts();
 
   if (loading) {
@@ -89,8 +89,7 @@ export default function PriceTicker() {
                 </span>
 
                 <span className="whitespace-nowrap text-xs font-semibold text-[#303a32] sm:text-sm">
-                  {bnNumber(product.today)} টাকা/
-                  {getUnit(product.unit)}
+                  {bnNumber(product.today)} টাকা/{getUnit(product.unit)}
                 </span>
 
                 <span
@@ -119,4 +118,6 @@ export default function PriceTicker() {
       </div>
     </section>
   );
-}
+};
+
+export default PriceTicker;

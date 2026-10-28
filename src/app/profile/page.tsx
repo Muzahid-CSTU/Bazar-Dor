@@ -1,136 +1,155 @@
 "use client";
 
-import { authClient } from "@/lib/auth-client";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import React, { useState, useEffect } from "react";
-import { FiLogOut } from "react-icons/fi";
+import { authClient } from "@/lib/auth-client";
+import toast from "react-hot-toast";
 
-export default function ProfilePage() {
+const ProfilePage = () => {
   const router = useRouter();
   const { data: session, isPending } = authClient.useSession();
-  
   const [name, setName] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
+  const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
+    if (!isPending && !session?.user) {
+      toast.error("প্রোফাইল দেখতে অনুগ্রহ করে আগে সাইন ইন করুন!");
+      router.push("/signin");
+    }
     if (session?.user?.name) {
       setName(session.user.name);
     }
-  }, [session]);
-
-  // লগইন না থাকলে সাইন-ইন পেজে রিডাইরেক্ট
-  useEffect(() => {
-    if (!isPending && !session?.user) {
-      router.push("/signin");
-    }
   }, [session, isPending, router]);
 
-  // নাম আপডেট হ্যান্ডলার
-  const handleUpdate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name.trim()) return;
-
-    setLoading(true);
-    setMessage(null);
-
-    const { error } = await authClient.updateUser({
-      name: name.trim(),
-    });
-
-    setLoading(false);
-
-    if (error) {
-      setMessage({ text: error.message || "নাম আপডেট করতে সমস্যা হয়েছে।", type: "error" });
-    } else {
-      setMessage({ text: "তথ্য সফলভাবে আপডেট করা হয়েছে!", type: "success" });
+  const handleLogout = async () => {
+    try {
+      await authClient.signOut();
+      toast.success("সফলভাবে সাইন আউট হয়েছে!");
+      router.push("/signin");
+      router.refresh();
+    } catch {
+      toast.error("সাইন আউট সম্পন্ন করা যায়নি!");
     }
   };
 
-  // সাইন আউট হ্যান্ডলার
-  const handleSignOut = async () => {
-    await authClient.signOut({
-      fetchOptions: {
-        onSuccess: () => {
-          router.push("/signin");
-          router.refresh();
-        },
-      },
-    });
+  const handleUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmedName = name.trim();
+
+    if (!trimmedName) {
+      toast.error("নামের ঘরটি খালি রাখা যাবে না!");
+      return;
+    }
+
+    setUpdating(true);
+    try {
+      await authClient.updateUser({
+        name: trimmedName,
+      });
+      toast.success("প্রোফাইল সফলভাবে আপডেট করা হয়েছে!");
+      router.refresh();
+    } catch {
+      toast.error("প্রোফাইল আপডেট করতে সমস্যা হয়েছে!");
+    } finally {
+      setUpdating(false);
+    }
   };
 
   if (isPending) {
     return (
-      <div className="min-h-[calc(100vh-120px)] bg-[#f3f6f4] flex justify-center items-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-600 border-t-transparent" />
-      </div>
+      <main className="min-h-screen bg-[#f0f5f0] px-4 py-10">
+        <div className="mx-auto max-w-2xl animate-pulse space-y-5">
+          <div className="space-y-2">
+            <div className="h-7 w-44 rounded-lg bg-gray-200" />
+            <div className="h-4 w-60 rounded bg-gray-200" />
+          </div>
+
+          <div className="rounded-3xl border border-[#e2ece3] bg-white p-7 shadow-sm">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="h-20 w-20 rounded-2xl bg-gray-200" />
+                <div className="space-y-2">
+                  <div className="h-6 w-36 rounded bg-gray-200" />
+                  <div className="h-4 w-48 rounded bg-gray-200" />
+                </div>
+              </div>
+              <div className="h-10 w-28 rounded-xl bg-gray-200" />
+            </div>
+          </div>
+
+          <div className="rounded-3xl border border-[#e2ece3] bg-white p-7 shadow-sm">
+            <div className="h-5 w-16 rounded bg-gray-200" />
+            <div className="mt-5 h-11 w-full rounded-xl bg-gray-200" />
+            <div className="mt-5 h-11 w-full rounded-xl bg-gray-200" />
+          </div>
+        </div>
+      </main>
     );
   }
 
-  if (!session?.user) return null;
+  if (!session?.user) {
+    return null;
+  }
+
+  const user = session.user;
+  const initialLetter = user.name?.charAt(0).toUpperCase() || "U";
 
   return (
-    <div className="min-h-[calc(100vh-120px)] bg-[#f3f6f4] py-10 px-4">
+    <main className="min-h-screen bg-[#f0f5f0] px-4 py-10 text-[#222e25]">
       <div className="mx-auto max-w-2xl">
-        {/* হেডার টেক্সট */}
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-800 tracking-tight">
+          <h1 className="text-2xl font-black tracking-tight text-[#222e25]">
             আমার প্রোফাইল
           </h1>
-          <p className="text-xs text-gray-500 mt-0.5">
+          <p className="mt-1 text-xs text-[#6e7b71]">
             আপনার অ্যাকাউন্টের তথ্য এখানে দেখুন।
           </p>
         </div>
 
-        {/* কার্ড ১: ইউজার তথ্য ও সাইন আউট বাটন */}
-        <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-5 sm:p-6 mb-5 flex items-center justify-between">
+        {/* User Card */}
+        <div className="flex flex-col gap-4 rounded-3xl border border-[#e2ece3] bg-white p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:p-7">
           <div className="flex items-center gap-4">
-            {/* প্রোফাইল ছবি */}
-            <div className="relative h-16 w-16 overflow-hidden rounded-2xl bg-gray-100 border border-gray-100 flex items-center justify-center shrink-0">
-              {session.user.image ? (
+            <div className="relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-[#f0f5f0] shadow-sm">
+              {user.image ? (
                 <img
-                  src={session.user.image}
-                  alt={session.user.name || "User Avatar"}
+                  src={user.image}
+                  alt={user.name || "User"}
                   className="h-full w-full object-cover"
                   onError={(e) => {
                     (e.currentTarget as HTMLElement).style.display = "none";
                   }}
                 />
               ) : (
-                <div className="flex h-full w-full items-center justify-center bg-emerald-700 text-xl font-bold text-white">
-                  {session.user.name?.charAt(0).toUpperCase() || "U"}
-                </div>
+                <span className="text-2xl font-bold text-[#058241]">
+                  {initialLetter}
+                </span>
               )}
             </div>
 
-            {/* নাম ও ইমেইল */}
             <div className="min-w-0">
-              <h2 className="text-lg font-bold text-gray-800 truncate">
-                {session.user.name}
+              <h2 className="truncate text-xl font-bold text-[#222e25]">
+                {user.name}
               </h2>
-              <p className="text-xs text-gray-400 truncate mt-0.5">
-                {session.user.email}
-              </p>
+              <p className="truncate text-xs text-[#7d8b80]">{user.email}</p>
             </div>
           </div>
 
-          {/* সাইন আউট বাটন */}
           <button
-            onClick={handleSignOut}
-            className="flex items-center gap-1.5 border border-red-300 text-red-500 hover:bg-red-50 px-3.5 py-1.5 rounded-xl text-xs font-medium transition"
+            type="button"
+            onClick={handleLogout}
+            className="inline-flex items-center justify-center gap-1.5 self-start rounded-xl border border-[#e7807d] px-4 py-2 text-xs font-semibold text-[#dc4843] transition hover:bg-[#fdf2f2] sm:self-center"
           >
-            <FiLogOut className="h-3.5 w-3.5 rotate-180" />
-            <span>সাইন আউট</span>
+            <span className="text-sm">↩</span> সাইন আউট
           </button>
         </div>
 
-        {/* কার্ড ২: এডিট ফর্ম */}
-        <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-6 sm:p-7">
-          <h3 className="text-sm font-bold text-gray-800 mb-4">তথ্য</h3>
+        {/* Edit Form */}
+        <div className="mt-5 rounded-3xl border border-[#e2ece3] bg-white p-6 shadow-sm sm:p-7">
+          <h3 className="mb-4 text-base font-bold text-[#222e25]">তথ্য</h3>
 
           <form onSubmit={handleUpdate} className="space-y-4">
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1.5">
+              <label className="mb-1.5 block text-xs font-bold text-[#222e25]">
                 নাম
               </label>
               <input
@@ -138,31 +157,31 @@ export default function ProfilePage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="আপনার নাম"
-                className="w-full px-3.5 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-emerald-600 focus:border-emerald-600 transition"
+                disabled={updating}
+                className="w-full rounded-xl border border-[#e4ebe4] bg-white px-4 py-2.5 text-sm text-[#222e25] outline-none transition focus:border-[#058241] focus:ring-1 focus:ring-[#058241] disabled:bg-gray-50"
                 required
               />
             </div>
 
-            {message && (
-              <p
-                className={`text-xs font-medium ${
-                  message.type === "success" ? "text-emerald-600" : "text-red-500"
-                }`}
-              >
-                {message.text}
-              </p>
-            )}
-
             <button
               type="submit"
-              disabled={loading}
-              className="w-full bg-[#058241] hover:bg-[#046e37] text-white font-medium py-2.5 rounded-lg text-sm transition shadow-sm disabled:opacity-70"
+              disabled={updating}
+              className="flex w-full items-center justify-center rounded-xl bg-[#058241] py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#046e37] disabled:opacity-70"
             >
-              {loading ? "আপডেট হচ্ছে..." : "আপডেট"}
+              {updating ? (
+                <span className="inline-flex items-center gap-2">
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  আপডেট হচ্ছে...
+                </span>
+              ) : (
+                "আপডেট"
+              )}
             </button>
           </form>
         </div>
       </div>
-    </div>
+    </main>
   );
-}
+};
+
+export default ProfilePage;

@@ -1,7 +1,6 @@
-
 "use client";
 
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import Link from "next/link";
 import { useProducts } from "@/context/ProductContext";
 
@@ -11,13 +10,13 @@ type CategoryPageProps = {
 
 type SortOption = "default" | "low" | "high";
 
-function bnNumber(value: number) {
+const bnNumber = (value: number) => {
   return new Intl.NumberFormat("bn-BD", {
     maximumFractionDigits: 1,
   }).format(value);
-}
+};
 
-function getUnit(unit: string) {
+const getUnit = (unit: string) => {
   const units: Record<string, string> = {
     kg: "কেজি",
     liter: "লিটার",
@@ -28,15 +27,14 @@ function getUnit(unit: string) {
   };
 
   return units[unit?.toLowerCase()] ?? unit ?? "কেজি";
-}
+};
 
-function getProductIcon(image?: string, categoryIcon?: string) {
+const getProductIcon = (image?: string, categoryIcon?: string) => {
   return image || categoryIcon || "🛒";
-}
+};
 
-export default function CategoryPage({ slug }: CategoryPageProps) {
+const CategoryPage = ({ slug }: CategoryPageProps) => {
   const { products, loading, error } = useProducts();
-
   const [sortBy, setSortBy] = useState<SortOption>("default");
 
   const categoryProducts = useMemo(() => {
@@ -47,21 +45,20 @@ export default function CategoryPage({ slug }: CategoryPageProps) {
   }, [products, slug]);
 
   const sortedProducts = useMemo(() => {
-    const result = [...categoryProducts];
+    const list = [...categoryProducts];
 
     if (sortBy === "low") {
-      result.sort((a, b) => a.today - b.today);
+      list.sort((a, b) => a.today - b.today);
     } else if (sortBy === "high") {
-      result.sort((a, b) => b.today - a.today);
+      list.sort((a, b) => b.today - a.today);
     }
 
-    return result;
+    return list;
   }, [categoryProducts, sortBy]);
 
   const categoryName = categoryProducts[0]?.categoryNameBn ?? "";
   const categoryIcon = categoryProducts[0]?.categoryIcon ?? "🛒";
 
-  // Loading state
   if (loading) {
     return (
       <section className="min-h-[60vh] bg-[#f0f5f0] px-4 py-8 sm:px-5">
@@ -94,7 +91,6 @@ export default function CategoryPage({ slug }: CategoryPageProps) {
     );
   }
 
-  // API error state
   if (error) {
     return (
       <section className="flex min-h-[60vh] items-center justify-center bg-[#f0f5f0] px-4">
@@ -118,7 +114,6 @@ export default function CategoryPage({ slug }: CategoryPageProps) {
     );
   }
 
-  // Empty state / invalid category
   if (categoryProducts.length === 0) {
     return (
       <section className="flex min-h-[60vh] items-center justify-center bg-[#f0f5f0] px-4">
@@ -149,7 +144,6 @@ export default function CategoryPage({ slug }: CategoryPageProps) {
   return (
     <section className="min-h-[60vh] bg-[#f0f5f0] px-4 py-6 sm:px-5">
       <div className="mx-auto max-w-6xl">
-        {/* Category heading */}
         <div className="flex items-center gap-3 rounded-2xl border border-[#e2eae3] bg-[#fbfdfb] p-4">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#f0f5f0] text-2xl">
             {categoryIcon}
@@ -166,7 +160,6 @@ export default function CategoryPage({ slug }: CategoryPageProps) {
           </div>
         </div>
 
-        {/* Sort control */}
         <div className="mt-4 flex items-center justify-end gap-2 rounded-xl border border-[#e2eae3] bg-[#fbfdfb] p-3">
           <label
             htmlFor="sort-products"
@@ -193,7 +186,6 @@ export default function CategoryPage({ slug }: CategoryPageProps) {
           মোট {bnNumber(sortedProducts.length)}টি পণ্য দেখানো হচ্ছে
         </p>
 
-        {/* Product cards */}
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {sortedProducts.map((product) => {
             const trend = product.change?.dir ?? "flat";
@@ -276,4 +268,6 @@ export default function CategoryPage({ slug }: CategoryPageProps) {
       </div>
     </section>
   );
-}
+};
+
+export default CategoryPage;
