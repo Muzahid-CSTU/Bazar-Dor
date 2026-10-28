@@ -1,4 +1,5 @@
-BazarDor (বাজার দর) 🛒
+## BazarDor (বাজার দর) 
+
 A modern web platform designed to monitor, track, and compare the daily market prices of essential daily commodities. It provides price transparency for daily groceries, helping consumers make informed purchasing decisions.
 BazarDor serves as an interactive price-tracking dashboard for everyday grocery essentials. The platform categorizes and displays up-to-date market rates across essential staples such as rice, lentils, oil, vegetables, fish, meat, dairy, and spices. Users can securely sign up, manage their account profile, and analyze price trends through a responsive, modern interface.
 
