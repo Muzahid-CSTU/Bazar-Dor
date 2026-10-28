@@ -86,6 +86,9 @@ export default function ProductDetailContent({
       return;
     }
 
+    // Store the ID after checking that product exists.
+    // This lets TypeScript safely use it inside the async function.
+    const productId = product.id;
     const controller = new AbortController();
 
     async function fetchProductDetails() {
@@ -95,7 +98,7 @@ export default function ProductDetailContent({
 
       try {
         const response = await fetch(
-          `https://openapi.programming-hero.com/api/bazardor/products/${product.id}`,
+          `https://openapi.programming-hero.com/api/bazardor/products/${productId}`,
           {
             cache: "no-store",
             signal: controller.signal,
